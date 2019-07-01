@@ -8,4 +8,8 @@ setup(name='ljbq',
       author_email='philya@gmail.com',
       license='MIT',
       packages=['ljbq'],
+      install_requires=[
+          'pandas-gbq',
+          'pandas'
+      ],
       zip_safe=False)
