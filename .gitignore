@@ -1,3 +1,5 @@
 ljbq.egg-info/
 __pycache__
 *.swp
+*.sublime-project
+*.sublime-workspace
