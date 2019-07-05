@@ -4,6 +4,26 @@ import os
 
 import pandas as pd
 
+def escape_quotes(value):
+    return value.replace('"', r'\"').replace("'", r"\'")
+
+def escape_params(query_params):
+    r"""
+    Escape quote characters in parameter values to prevent SQL injection
+
+    >>> escape_params({'key1': 'value example'})
+    {'key1': 'value example'}
+
+    >>> escape_params({'key1': 'value "example'})["key1"] == r"value \"example"
+    True
+ 
+    >>> escape_params({'key1': 'value "example\' !'})["key1"] == r"value \"example\' !"
+    True
+    """
+    safe_params = {}
+    for key, value in query_params.items():
+        safe_params[key] = escape_quotes(value)
+    return safe_params
 
 def query_hash(project_id, query_name, **query_params):
 
@@ -35,7 +55,8 @@ def get_result(project_id, query_name, query_params={}, query_dir='bqsql', cache
             query_templ = query_f.read()
 
         # substitute parameters
-        query_str = query_templ.format(**query_params)
+        safe_params = escape_params(query_params)
+        query_str = query_templ.format(**safe_params)
 
         res = pd.io.gbq.read_gbq(query_str, project_id=project_id, dialect="standard")
 
@@ -43,3 +64,7 @@ def get_result(project_id, query_name, query_params={}, query_dir='bqsql', cache
         res.to_pickle(cache_file_name)
 
     return res
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
