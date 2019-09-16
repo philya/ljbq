@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 def escape_quotes(value):
-    return value.replace('"', r'\"').replace("'", r"\'")
+    return str(value).replace('"', r'\"').replace("'", r"\'")
 
 def escape_params(query_params):
     r"""
