@@ -37,7 +37,7 @@ def query_hash(project_id, query_name, **query_params):
     return hashlib.sha224(id_string.encode('utf8')).hexdigest()
 
     
-def get_result(project_id, query_name, query_params={}, query_dir='bqsql', cache_dir='bqcache', reload=False):
+def get_result(project_id, query_name, query_params={}, query_dir='bqsql', cache_dir='bqcache', reload=False, escape_values=True):
 
     # compute file name and params hash
     qhash = query_hash(project_id, query_name, **query_params)
@@ -55,7 +55,10 @@ def get_result(project_id, query_name, query_params={}, query_dir='bqsql', cache
             query_templ = query_f.read()
 
         # substitute parameters
-        safe_params = escape_params(query_params)
+        if escape_values:
+            safe_params = escape_params(query_params)
+        else:
+            safe_params = query_params
         query_str = query_templ.format(**safe_params)
 
         res = pd.io.gbq.read_gbq(query_str, project_id=project_id, dialect="standard")
